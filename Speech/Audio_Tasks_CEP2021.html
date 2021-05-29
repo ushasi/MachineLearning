@@ -1,0 +1,1371 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2021-05-24 Mon 15:50 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Audio tasks using PyTorch</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content="Vinit Unni" />
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: auto;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline; margin-top: 14px;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { width: 90%; }
+  /*]]>*/-->
+</style>
+<link rel="stylesheet" type="text/css" href="https://fniessen.github.io/org-html-themes/src/readtheorg_theme/css/htmlize.css"/>
+<link rel="stylesheet" type="text/css" href="https://fniessen.github.io/org-html-themes/src/readtheorg_theme/css/readtheorg.css"/>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="https://fniessen.github.io/org-html-themes/src/lib/js/jquery.stickytableheaders.min.js"></script>
+<script type="text/javascript" src="https://fniessen.github.io/org-html-themes/src/readtheorg_theme/js/readtheorg.js"></script>
+<style>pre.src {background-color: #303030; color: #e5e5e5;}</style>
+<script type="text/javascript">
+// @license magnet:?xt=urn:btih:1f739d935676111cfff4b4693e3816e664797050&amp;dn=gpl-3.0.txt GPL-v3-or-Later
+<!--/*--><![CDATA[/*><!--*/
+     function CodeHighlightOn(elem, id)
+     {
+       var target = document.getElementById(id);
+       if(null != target) {
+         elem.classList.add("code-highlighted");
+         target.classList.add("code-highlighted");
+       }
+     }
+     function CodeHighlightOff(elem, id)
+     {
+       var target = document.getElementById(id);
+       if(null != target) {
+         elem.classList.remove("code-highlighted");
+         target.classList.remove("code-highlighted");
+       }
+     }
+    /*]]>*///-->
+// @license-end
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">Audio tasks using PyTorch</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#orgc932cc7">Task 1- Speech command Recognition using convolution and torchaudio</a>
+<ul>
+<li><a href="#orgd5340ee">Install torch</a></li>
+<li><a href="#org185d4d1">Dataset</a>
+<ul>
+<li><a href="#orgb203b46">Import</a></li>
+<li><a href="#org4b82dc0">Split</a></li>
+<li><a href="#org2b9eb5d">Transforms on data</a></li>
+<li><a href="#org7722439">Indexing labels</a></li>
+<li><a href="#org9b3ed35">Create Batches</a></li>
+</ul>
+</li>
+<li><a href="#org7f1628d">Network</a>
+<ul>
+<li><a href="#org0e1dde5">Architecture</a></li>
+<li><a href="#org5e2d493">Model</a></li>
+</ul>
+</li>
+<li><a href="#org832395a">Training/Testing</a></li>
+<li><a href="#org2bf1ce9">Test your own voice</a></li>
+</ul>
+</li>
+<li><a href="#org6b82b7b">Task 2-Speech command recognition using RNNs</a>
+<ul>
+<li><a href="#orgb1a8512">Dataset</a>
+<ul>
+<li><a href="#org995bc07">Import</a></li>
+<li><a href="#org93e6227">Split</a></li>
+<li><a href="#org68cc1cb">Transform</a></li>
+<li><a href="#orge687a2b">Dataset class</a></li>
+</ul>
+</li>
+<li><a href="#orgecf5d11">Network</a>
+<ul>
+<li><a href="#org6326611">Architecture</a></li>
+<li><a href="#org7e98982">Train/Test</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#org063f974">Task3- How to use a pre-trained model?</a>
+<ul>
+<li><a href="#orgd490e96">Download the model</a></li>
+<li><a href="#org93ee7d7">Record voice</a></li>
+<li><a href="#orgf460810">Record and Infer</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<p>
+In this assignment, we will try some audio tasks using PyTorch. PyTorch is one of the most widely used libraries for Deep learning research. As the name suggests, its main focus is to use Python's interface and expressive nature to make the creation of complex deep learning  architectures easy. There are loads of tutorials available online for PyTorch. The official <a href="https://pytorch.org/tutorials/">PyTorch Tutorials</a> are a good place to get familiar with the system. For those who are more comfortable with a traditional text-book based approach, <a href="https://pytorch.org/assets/deep-learning/Deep-Learning-with-PyTorch.pdf">Deep Learning with Pytorch</a> is a really good book to look at.<br />
+In this tutorial, we will focus, primarily, on using PyTorch to tackle some audio tasks. There are three tasks which will introduce different ways in which a problem can be explored. In the <b>first task</b> we will use the <i>torchaudio</i> library to import a dataset and create a simple multi-class classifier for the same. In the <b>second task</b>, we will explore some sequence models to look at another flavour of deep learning based audio tasks. n the <b>final task</b>, we will look at how we can import and use some existing pre-trained models for any of other tasks which we are interested in.<br />
+<b><span class="underline">NOTE:If you are comfortable with PyTorch, you can safely ignore Task1 and move on to Task2.</span></b><br />
+</p>
+<div id="outline-container-orgc932cc7" class="outline-2">
+<h2 id="orgc932cc7">Task 1- Speech command Recognition using convolution and torchaudio</h2>
+<div class="outline-text-2" id="text-orgc932cc7">
+<p>
+Most of this task has been taken from <a href="https://pytorch.org/tutorials/intermediate/speech_command_recognition_with_torchaudio.html">this PyTorch Tutorial</a>. It is recommended that you use the <a href="https://colab.research.google.com">Google Colab Notebook</a> for this tutorial. However, if you have a GPU enabled system of your own, please install the appropriate python libraries and use the code snippets in your own system. <b>For those using the colab-notebook, please ensure that the Hardware accelerator "GPU" is enabled by going into <i>Runtime&gt;Change Runtime Type</i></b>.
+</p>
+</div>
+<div id="outline-container-orgd5340ee" class="outline-3">
+<h3 id="orgd5340ee">Install torch</h3>
+<div class="outline-text-3" id="text-orgd5340ee">
+<p>
+We begin by installing and importing torch and the appropriate libraries into the current colab session. Paste then snippet below into a cell and execute it using <i>Shift+Enter</i>
+</p>
+<div class="org-src-container">
+<pre class="src src-python">%matplotlib inline
+!pip install torch==1.7.0+cu101 torchvision==0.8.1+cu101 torchaudio==0.7.0 -f https://download.pytorch.org/whl/torch_stable.html
+!pip install pydub
+
+<span style="color: #ff6188;">import</span> numpy <span style="color: #ff6188;">as</span> np
+<span style="color: #ff6188;">import</span> torch
+<span style="color: #ff6188;">import</span> torch.nn <span style="color: #ff6188;">as</span> nn
+<span style="color: #ff6188;">import</span> torch.nn.functional <span style="color: #ff6188;">as</span> F
+<span style="color: #ff6188;">import</span> torch.optim <span style="color: #ff6188;">as</span> optim
+<span style="color: #ff6188;">import</span> torchaudio
+
+<span style="color: #ff6188;">import</span> matplotlib.pyplot <span style="color: #ff6188;">as</span> plt
+<span style="color: #ff6188;">import</span> IPython.display <span style="color: #ff6188;">as</span> ipd
+<span style="color: #ff6188;">from</span> tqdm.notebook <span style="color: #ff6188;">import</span> tqdm
+</pre>
+</div>
+<p>
+Let us check if CUDA device is available using
+</p>
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #ff6188;">print</span>(torch.cuda.is_available())
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org185d4d1" class="outline-3">
+<h3 id="org185d4d1">Dataset</h3>
+<div class="outline-text-3" id="text-org185d4d1">
+</div>
+<div id="outline-container-orgb203b46" class="outline-4">
+<h4 id="orgb203b46">Import</h4>
+<div class="outline-text-4" id="text-orgb203b46">
+<p>
+For the current task, we will be using the <a href="https://ai.googleblog.com/2017/08/launching-speech-commands-dataset.html">Speech Commands Dataset</a> by google. It is a dataset of around 35 single-word commands spoken by around 65000 people. Importing this dataset is a piece of cake due to torchaudio
+</p>
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #ff6188;">from</span> torchaudio.datasets <span style="color: #ff6188;">import</span> SPEECHCOMMANDS
+<span style="color: #ff6188;">import</span> os
+</pre>
+</div>
+<p>
+As we have imported this dataset using torchaudio, it is already of the form of a <a href="https://pytorch.org/docs/stable/data.html">torch.utils.data.Dataset</a> class.
+</p>
+</div>
+</div>
+<div id="outline-container-org4b82dc0" class="outline-4">
+<h4 id="org4b82dc0">Split</h4>
+<div class="outline-text-4" id="text-org4b82dc0">
+<p>
+Now we need to create the test, train and validation splits (for the purposes of the tutorial, we won't be looking at the validation set)
+</p>
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #727072;">#</span><span style="color: #727072; font-style: italic;">Define a class subset derived from SpeechCommands</span>
+  <span style="color: #ff6188;">class</span> <span style="color: #78dce8;">SubsetSC</span>(SPEECHCOMMANDS):
+      <span style="color: #ff6188;">def</span> <span style="color: #a9dc76;">__init__</span>(<span style="color: #ff6188;">self</span>, subset: <span style="color: #ab9df2;">str</span> = <span style="color: #ab9df2;">None</span>):
+          <span style="color: #ab9df2;">super</span>().__init__(<span style="color: #ffd866;">"./"</span>, download=<span style="color: #ab9df2;">True</span>)
+
+        <span style="color: #727072;"># </span><span style="color: #727072; font-style: italic;">member function to load list of a particular split</span>
+          <span style="color: #ff6188;">def</span> <span style="color: #a9dc76;">load_list</span>(filename):
+              <span style="color: #fcfcfa;">filepath</span> = os.path.join(<span style="color: #ff6188;">self</span>._path, filename)
+              <span style="color: #ff6188;">with</span> <span style="color: #ab9df2;">open</span>(filepath) <span style="color: #ff6188;">as</span> fileobj:
+                  <span style="color: #ff6188;">return</span> [os.path.join(<span style="color: #ff6188;">self</span>._path, line.strip()) <span style="color: #ff6188;">for</span> line <span style="color: #ff6188;">in</span> fileobj]
+
+          <span style="color: #ff6188;">if</span> subset == <span style="color: #ffd866;">"validation"</span>:
+              <span style="color: #ff6188;">self</span>._walker = load_list(<span style="color: #ffd866;">"validation_list.txt"</span>)
+          <span style="color: #ff6188;">elif</span> subset == <span style="color: #ffd866;">"testing"</span>:
+              <span style="color: #ff6188;">self</span>._walker = load_list(<span style="color: #ffd866;">"testing_list.txt"</span>)
+          <span style="color: #ff6188;">elif</span> subset == <span style="color: #ffd866;">"training"</span>:
+              <span style="color: #fcfcfa;">excludes</span> = load_list(<span style="color: #ffd866;">"validation_list.txt"</span>) + load_list(<span style="color: #ffd866;">"testing_list.txt"</span>)
+              <span style="color: #fcfcfa;">excludes</span> = <span style="color: #ab9df2;">set</span>(excludes)
+              <span style="color: #ff6188;">self</span>._walker = [w <span style="color: #ff6188;">for</span> w <span style="color: #ff6188;">in</span> <span style="color: #ff6188;">self</span>._walker <span style="color: #ff6188;">if</span> w <span style="color: #ff6188;">not</span> <span style="color: #ff6188;">in</span> excludes]
+
+
+  <span style="color: #fcfcfa;">train_set</span> = SubsetSC(<span style="color: #ffd866;">"training"</span>)
+  <span style="color: #fcfcfa;">test_set</span> = SubsetSC(<span style="color: #ffd866;">"testing"</span>)
+
+</pre>
+</div>
+<p>
+We can have a look at the size if each set and what each element comprises of with the below snippet
+</p>
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #ff6188;">print</span>(<span style="color: #ab9df2;">len</span>(train_set))
+<span style="color: #ff6188;">print</span>(<span style="color: #ab9df2;">len</span>(test_set))
+<span style="color: #ff6188;">print</span>(train_set[0])
+<span style="color: #fcfcfa;">waveform</span>, <span style="color: #fcfcfa;">sample_rate</span>, <span style="color: #fcfcfa;">label</span>, <span style="color: #fcfcfa;">speaker_id</span>, <span style="color: #fcfcfa;">utterance_number</span> = train_set[0]
+</pre>
+</div>
+<p>
+A data point in the SPEECHCOMMANDS dataset is a tuple made of a waveform (the audio signal), the sample rate, the utterance (label), the ID of the speaker, the number of the utterance. To get a better sense of what the waveform looks like, we can plot it in numpy
+</p>
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #ff6188;">print</span>(<span style="color: #ffd866;">"Shape of waveform: {}"</span>.<span style="color: #ab9df2;">format</span>(waveform.size()))
+<span style="color: #ff6188;">print</span>(<span style="color: #ffd866;">"Sample rate of waveform: {}"</span>.<span style="color: #ab9df2;">format</span>(sample_rate))
+plt.plot(waveform.t().numpy());
+</pre>
+</div>
+<p>
+To see what the labels look like, let us create a set of the labels using list-comprehension
+</p>
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #fcfcfa;">labels</span> = {datapoint[2] <span style="color: #ff6188;">for</span> datapoint <span style="color: #ff6188;">in</span> train_set}
+labels
+</pre>
+</div>
+<p>
+We can also hear a random example using Ipython's display module
+</p>
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #fcfcfa;">rand_id</span>=np.random.randint(<span style="color: #ab9df2;">len</span>(train_set))
+<span style="color: #ff6188;">print</span>(rand_id)
+<span style="color: #ff6188;">print</span>(train_set[rand_id][2])
+waveform_first, *<span style="color: #fcfcfa;">_</span> = train_set[rand_id]
+ipd.Audio(waveform_first.numpy(), rate=sample_rate)
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org2b9eb5d" class="outline-4">
+<h4 id="org2b9eb5d">Transforms on data</h4>
+<div class="outline-text-4" id="text-org2b9eb5d">
+<p>
+Very often, we need to transform our data to either increase the speed, remove noise, add noise, etc. Here, we will show how to use torchaudio tools to downsample our data to improve the processing time without losing much of the info
+</p>
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #fcfcfa;">new_sample_rate</span> = 8000
+<span style="color: #fcfcfa;">transform</span> = torchaudio.transforms.Resample(orig_freq=sample_rate, new_freq=new_sample_rate)
+<span style="color: #fcfcfa;">transformed</span> = transform(waveform_first)
+ipd.Audio(transformed.numpy(), rate=new_sample_rate)
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org7722439" class="outline-4">
+<h4 id="org7722439">Indexing labels</h4>
+<div class="outline-text-4" id="text-org7722439">
+<p>
+We will also need to assign numerical values to each label. As we initially saw the label as a set, which is an unordered data-type, we will first convert it into a list and sort it.
+</p>
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #fcfcfa;">labels</span>=<span style="color: #ab9df2;">sorted</span>(<span style="color: #ab9df2;">list</span>(labels))
+</pre>
+</div>
+<p>
+Now, we define functions which will be able to return the index of a label given an input label and vice versa
+</p>
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #ff6188;">def</span> <span style="color: #a9dc76;">label_to_index</span>(word):
+    <span style="color: #727072;"># </span><span style="color: #727072; font-style: italic;">Return the position of the word in labels</span>
+    <span style="color: #ff6188;">return</span> torch.tensor(labels.index(word))
+
+
+<span style="color: #ff6188;">def</span> <span style="color: #a9dc76;">index_to_label</span>(index):
+    <span style="color: #727072;"># </span><span style="color: #727072; font-style: italic;">Return the word corresponding to the index in labels</span>
+    <span style="color: #727072;"># </span><span style="color: #727072; font-style: italic;">This is the inverse of label_to_index</span>
+    <span style="color: #ff6188;">return</span> labels[index]
+
+
+<span style="color: #fcfcfa;">word_start</span> = labels[np.random.randint(<span style="color: #ab9df2;">len</span>(labels))]
+<span style="color: #fcfcfa;">index</span> = label_to_index(word_start)
+<span style="color: #fcfcfa;">word_recovered</span> = index_to_label(index)
+
+<span style="color: #ff6188;">print</span>(word_start, <span style="color: #ffd866;">"--&gt;"</span>, index, <span style="color: #ffd866;">"--&gt;"</span>, word_recovered)
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org9b3ed35" class="outline-4">
+<h4 id="org9b3ed35">Create Batches</h4>
+<div class="outline-text-4" id="text-org9b3ed35">
+<p>
+Now, we need only the waveform and the label while training our model. So, we define two functions which will pad the inputs (so that they are of uniform size) and create two collated variables with waveform and labels (input and output) when we pass a batch to it. Please note, we are applying the downsampling
+</p>
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #ff6188;">def</span> <span style="color: #a9dc76;">pad_sequence</span>(batch):
+    <span style="color: #727072;"># </span><span style="color: #727072; font-style: italic;">Make all tensor in a batch the same length by padding with zeros</span>
+    <span style="color: #fcfcfa;">batch</span> = [item.t() <span style="color: #ff6188;">for</span> item <span style="color: #ff6188;">in</span> batch]
+    <span style="color: #fcfcfa;">batch</span> = torch.nn.utils.rnn.pad_sequence(batch, batch_first=<span style="color: #ab9df2;">True</span>, padding_value=0.)
+    <span style="color: #ff6188;">return</span> batch.permute(0, 2, 1)
+
+
+<span style="color: #ff6188;">def</span> <span style="color: #a9dc76;">collate_fn</span>(batch):
+
+    <span style="color: #727072;"># </span><span style="color: #727072; font-style: italic;">A data tuple has the form:</span>
+    <span style="color: #727072;"># </span><span style="color: #727072; font-style: italic;">waveform, sample_rate, label, speaker_id, utterance_number</span>
+
+    <span style="color: #fcfcfa;">tensors</span>, <span style="color: #fcfcfa;">targets</span> = [], []
+
+    <span style="color: #727072;"># </span><span style="color: #727072; font-style: italic;">Gather in lists, and encode labels as indices</span>
+    <span style="color: #ff6188;">for</span> waveform, _, label, *_ <span style="color: #ff6188;">in</span> batch:
+        <span style="color: #fcfcfa;">tensors</span> += [transform(waveform)]
+        <span style="color: #fcfcfa;">targets</span> += [label_to_index(label)]
+
+    <span style="color: #727072;"># </span><span style="color: #727072; font-style: italic;">Group the list of tensors into a batched tensor</span>
+    <span style="color: #fcfcfa;">tensors</span> = pad_sequence(tensors)
+    <span style="color: #fcfcfa;">targets</span> = torch.stack(targets)
+
+    <span style="color: #ff6188;">return</span> tensors, targets
+</pre>
+</div>
+<p>
+This collate function is passed into the DataLoader method of PyTorch. DataLoader helps us bridge the gap between out raw dataset and batched samples of tensors which can be used by PyTorch
+</p>
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #fcfcfa;">device</span>=<span style="color: #ffd866;">"cuda"</span>
+<span style="color: #fcfcfa;">batch_size</span> = 256
+<span style="color: #ff6188;">if</span> device == <span style="color: #ffd866;">"cuda"</span>:
+    <span style="color: #fcfcfa;">num_workers</span> = 1
+    <span style="color: #fcfcfa;">pin_memory</span> = <span style="color: #ab9df2;">True</span>
+<span style="color: #ff6188;">else</span>:
+    <span style="color: #fcfcfa;">num_workers</span> = 0
+    <span style="color: #fcfcfa;">pin_memory</span> = <span style="color: #ab9df2;">False</span>
+
+<span style="color: #fcfcfa;">train_loader</span> = torch.utils.data.DataLoader(
+    train_set,
+    batch_size=batch_size,
+    shuffle=<span style="color: #ab9df2;">True</span>,
+    collate_fn=collate_fn,
+    num_workers=num_workers,
+    pin_memory=pin_memory,
+)
+<span style="color: #fcfcfa;">test_loader</span> = torch.utils.data.DataLoader(
+    test_set,
+    batch_size=batch_size,
+    shuffle=<span style="color: #ab9df2;">False</span>,
+    drop_last=<span style="color: #ab9df2;">False</span>,
+    collate_fn=collate_fn,
+    num_workers=num_workers,
+    pin_memory=pin_memory,
+)
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-org7f1628d" class="outline-3">
+<h3 id="org7f1628d">Network</h3>
+<div class="outline-text-3" id="text-org7f1628d">
+<p>
+Now the Dataset is in place, let us go ahead and define the network. For the purposes of this task, we will be implementing the <a href="https://arxiv.org/pdf/1610.00087.pdf">M5 Network</a> which is a convolutional neural network for audio processing.
+</p>
+</div>
+<div id="outline-container-org0e1dde5" class="outline-4">
+<h4 id="org0e1dde5">Architecture</h4>
+<div class="outline-text-4" id="text-org0e1dde5">
+<p>
+All our network definitions will be children of the torch.nn.Module. In the init of our class, we define what each layer looks like. In the forward function, we define how these layers are related to each other. 
+</p>
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #ff6188;">class</span> <span style="color: #78dce8;">M5</span>(nn.Module):
+    <span style="color: #ff6188;">def</span> <span style="color: #a9dc76;">__init__</span>(<span style="color: #ff6188;">self</span>, n_input=1, n_output=35, stride=16, n_channel=32):
+        <span style="color: #ab9df2;">super</span>().__init__()
+      <span style="color: #727072;"># </span><span style="color: #727072; font-style: italic;">define what each layer looks like</span>
+        <span style="color: #ff6188;">self</span>.conv1 = nn.Conv1d(n_input, n_channel, kernel_size=80, stride=stride)
+        <span style="color: #ff6188;">self</span>.bn1 = nn.BatchNorm1d(n_channel)
+        <span style="color: #ff6188;">self</span>.pool1 = nn.MaxPool1d(4)
+        <span style="color: #ff6188;">self</span>.conv2 = nn.Conv1d(n_channel, n_channel, kernel_size=3)
+        <span style="color: #ff6188;">self</span>.bn2 = nn.BatchNorm1d(n_channel)
+        <span style="color: #ff6188;">self</span>.pool2 = nn.MaxPool1d(4)
+        <span style="color: #ff6188;">self</span>.conv3 = nn.Conv1d(n_channel, 2 * n_channel, kernel_size=3)
+        <span style="color: #ff6188;">self</span>.bn3 = nn.BatchNorm1d(2 * n_channel)
+        <span style="color: #ff6188;">self</span>.pool3 = nn.MaxPool1d(4)
+        <span style="color: #ff6188;">self</span>.conv4 = nn.Conv1d(2 * n_channel, 2 * n_channel, kernel_size=3)
+        <span style="color: #ff6188;">self</span>.bn4 = nn.BatchNorm1d(2 * n_channel)
+        <span style="color: #ff6188;">self</span>.pool4 = nn.MaxPool1d(4)
+        <span style="color: #ff6188;">self</span>.fc1 = nn.Linear(2 * n_channel, n_output)
+
+    <span style="color: #ff6188;">def</span> <span style="color: #a9dc76;">forward</span>(<span style="color: #ff6188;">self</span>, x):
+      <span style="color: #727072;">#</span><span style="color: #727072; font-style: italic;">What is out information flow through each of the layer</span>
+        <span style="color: #fcfcfa;">x</span> = <span style="color: #ff6188;">self</span>.conv1(x)
+        <span style="color: #fcfcfa;">x</span> = F.relu(<span style="color: #ff6188;">self</span>.bn1(x))
+        <span style="color: #fcfcfa;">x</span> = <span style="color: #ff6188;">self</span>.pool1(x)
+        <span style="color: #fcfcfa;">x</span> = <span style="color: #ff6188;">self</span>.conv2(x)
+        <span style="color: #fcfcfa;">x</span> = F.relu(<span style="color: #ff6188;">self</span>.bn2(x))
+        <span style="color: #fcfcfa;">x</span> = <span style="color: #ff6188;">self</span>.pool2(x)
+        <span style="color: #fcfcfa;">x</span> = <span style="color: #ff6188;">self</span>.conv3(x)
+        <span style="color: #fcfcfa;">x</span> = F.relu(<span style="color: #ff6188;">self</span>.bn3(x))
+        <span style="color: #fcfcfa;">x</span> = <span style="color: #ff6188;">self</span>.pool3(x)
+        <span style="color: #fcfcfa;">x</span> = <span style="color: #ff6188;">self</span>.conv4(x)
+        <span style="color: #fcfcfa;">x</span> = F.relu(<span style="color: #ff6188;">self</span>.bn4(x))
+        <span style="color: #fcfcfa;">x</span> = <span style="color: #ff6188;">self</span>.pool4(x)
+        <span style="color: #fcfcfa;">x</span> = F.avg_pool1d(x, x.shape[-1])
+        <span style="color: #fcfcfa;">x</span> = x.permute(0, 2, 1)
+        <span style="color: #fcfcfa;">x</span> = <span style="color: #ff6188;">self</span>.fc1(x)
+      <span style="color: #727072;"># </span><span style="color: #727072; font-style: italic;">our final output is a softmax over the ouput layer which represents the probability of our input being from each class.</span>
+        <span style="color: #ff6188;">return</span> F.log_softmax(x, dim=2)
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org5e2d493" class="outline-4">
+<h4 id="org5e2d493">Model</h4>
+<div class="outline-text-4" id="text-org5e2d493">
+<p>
+Now that our model architecture is defined, we will define our model based on the class definition
+</p>
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #fcfcfa;">model</span> = M5(n_input=transformed.shape[0], n_output=<span style="color: #ab9df2;">len</span>(labels))
+model.to(device)
+<span style="color: #ff6188;">print</span>(model)
+
+
+<span style="color: #ff6188;">def</span> <span style="color: #a9dc76;">count_parameters</span>(model):
+    <span style="color: #ff6188;">return</span> <span style="color: #ab9df2;">sum</span>(p.numel() <span style="color: #ff6188;">for</span> p <span style="color: #ff6188;">in</span> model.parameters() <span style="color: #ff6188;">if</span> p.requires_grad)
+
+
+<span style="color: #fcfcfa;">n</span> = count_parameters(model)
+<span style="color: #ff6188;">print</span>(<span style="color: #ffd866;">"Number of parameters: %s"</span> % n)
+</pre>
+</div>
+<p>
+An important part of the model is also the optimiser we will use to optimise our weights based on the loss value. As in the paper, we will be using an Adam optimizer with decaying learning rate. However, it is encouraged that you experiment with other types of optimizers too.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #fcfcfa;">optimizer</span> = optim.Adam(model.parameters(), lr=0.01, weight_decay=0.0001)
+<span style="color: #fcfcfa;">scheduler</span> = optim.lr_scheduler.StepLR(optimizer, step_size=20, gamma=0.1)  <span style="color: #727072;"># </span><span style="color: #727072; font-style: italic;">reduce the learning after 20 epochs by a factor of 10</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-org832395a" class="outline-3">
+<h3 id="org832395a">Training/Testing</h3>
+<div class="outline-text-3" id="text-org832395a">
+<p>
+We have set up our dataset and we have also defined our network, now it is time to define our training and testing regime. The important part of the training step is to define our loss function
+</p>
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #ff6188;">def</span> <span style="color: #a9dc76;">train</span>(model, epoch, log_interval):
+  <span style="color: #727072;"># </span><span style="color: #727072; font-style: italic;">It is important to set the model to train mode</span>
+    model.train()
+    <span style="color: #ff6188;">for</span> batch_idx, (data, target) <span style="color: #ff6188;">in</span> <span style="color: #ab9df2;">enumerate</span>(train_loader):
+
+        <span style="color: #fcfcfa;">data</span> = data.to(device)
+        <span style="color: #fcfcfa;">target</span> = target.to(device)
+
+        <span style="color: #fcfcfa;">output</span> = model(data)
+
+        <span style="color: #727072;"># </span><span style="color: #727072; font-style: italic;">negative log-likelihood for a tensor of size (batch x 1 x n_output)</span>
+        <span style="color: #fcfcfa;">loss</span> = F.nll_loss(output.squeeze(), target)
+
+      <span style="color: #727072;"># </span><span style="color: #727072; font-style: italic;">import to set gradients to zero to flush out old values</span>
+        optimizer.zero_grad()
+
+      <span style="color: #727072;"># </span><span style="color: #727072; font-style: italic;">calculate gradients based on present loss value</span>
+        loss.backward()
+
+      <span style="color: #727072;">#</span><span style="color: #727072; font-style: italic;">change weights based on optimiser</span>
+        optimizer.step()
+
+        <span style="color: #727072;"># </span><span style="color: #727072; font-style: italic;">print training stats</span>
+        <span style="color: #ff6188;">if</span> batch_idx % log_interval == 0:
+            <span style="color: #ff6188;">print</span>(f<span style="color: #ffd866;">"Train Epoch: {epoch} [{batch_idx * len(data)}/{len(train_loader.dataset)} ({100. * batch_idx / len(train_loader):.0f}%)]\tLoss: {loss.item():.6f}"</span>)
+
+        <span style="color: #727072;"># </span><span style="color: #727072; font-style: italic;">update progress bar</span>
+        pbar.update(pbar_update)
+        <span style="color: #727072;"># </span><span style="color: #727072; font-style: italic;">record loss</span>
+        losses.append(loss.item())
+</pre>
+</div>
+<p>
+As we have defined the train function, we will also define the eval function
+</p>
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #ff6188;">def</span> <span style="color: #a9dc76;">number_of_correct</span>(pred, target):
+    <span style="color: #727072;"># </span><span style="color: #727072; font-style: italic;">count number of correct predictions</span>
+    <span style="color: #ff6188;">return</span> pred.squeeze().eq(target).<span style="color: #ab9df2;">sum</span>().item()
+
+
+<span style="color: #ff6188;">def</span> <span style="color: #a9dc76;">get_likely_index</span>(tensor):
+    <span style="color: #727072;"># </span><span style="color: #727072; font-style: italic;">find most likely label index for each element in the batch</span>
+    <span style="color: #ff6188;">return</span> tensor.argmax(dim=-1)
+
+
+<span style="color: #ff6188;">def</span> <span style="color: #a9dc76;">test</span>(model, epoch):
+  <span style="color: #727072;"># </span><span style="color: #727072; font-style: italic;">Important to set the model to eval mode. Without this some layers like batchnorm, dropout etc won't work well</span>
+    model.<span style="color: #ab9df2;">eval</span>()
+    <span style="color: #fcfcfa;">correct</span> = 0
+    <span style="color: #ff6188;">for</span> data, target <span style="color: #ff6188;">in</span> test_loader:
+
+        <span style="color: #fcfcfa;">data</span> = data.to(device)
+        <span style="color: #fcfcfa;">target</span> = target.to(device)
+
+        <span style="color: #fcfcfa;">output</span> = model(data)
+
+        <span style="color: #fcfcfa;">pred</span> = get_likely_index(output)
+        <span style="color: #fcfcfa;">correct</span> += number_of_correct(pred, target)
+
+        <span style="color: #727072;"># </span><span style="color: #727072; font-style: italic;">update progress bar</span>
+        pbar.update(pbar_update)
+
+    <span style="color: #ff6188;">print</span>(f<span style="color: #ffd866;">"\nTest Epoch: {epoch}\tAccuracy: {correct}/{len(test_loader.dataset)} ({100. * correct / len(test_loader.dataset):.0f}%)\n"</span>)
+</pre>
+</div>
+<p>
+Now that we have define the train and test functions, let us go ahead and train our network for 2 epochs.
+<i>An epoch means we have gone through the entire dataset once</i>
+</p>
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #fcfcfa;">log_interval</span> = 20
+<span style="color: #fcfcfa;">n_epoch</span> = 2
+
+<span style="color: #fcfcfa;">pbar_update</span> = 1 / (<span style="color: #ab9df2;">len</span>(train_loader) + <span style="color: #ab9df2;">len</span>(test_loader))
+<span style="color: #fcfcfa;">losses</span> = []
+
+<span style="color: #727072;"># </span><span style="color: #727072; font-style: italic;">The transform needs to live on the same device as the model and the data.</span>
+<span style="color: #fcfcfa;">transform</span> = transform.to(device)
+<span style="color: #ff6188;">with</span> tqdm(total=n_epoch) <span style="color: #ff6188;">as</span> pbar:
+    <span style="color: #ff6188;">for</span> epoch <span style="color: #ff6188;">in</span> <span style="color: #ab9df2;">range</span>(1, n_epoch + 1):
+        train(model, epoch, log_interval)
+        test(model, epoch)
+        scheduler.step()
+
+<span style="color: #727072;"># </span><span style="color: #727072; font-style: italic;">Let's plot the training loss versus the number of iteration.</span>
+ plt.plot(losses);
+ plt.title(<span style="color: #ffd866;">"training loss"</span>);
+</pre>
+</div>
+<p>
+How much is the training accuracy? Is it better than chance (1/#labels). Can we improve the accuracy if we run the number of epochs?
+Let us look at how a random sample was predicted
+</p>
+<div class="org-src-container">
+<pre class="src src-python">  <span style="color: #ff6188;">def</span> <span style="color: #a9dc76;">predict</span>(tensor):
+      <span style="color: #727072;"># </span><span style="color: #727072; font-style: italic;">Use the model to predict the label of the waveform</span>
+      <span style="color: #fcfcfa;">tensor</span> = tensor.to(device)
+      <span style="color: #fcfcfa;">tensor</span> = transform(tensor)
+      <span style="color: #fcfcfa;">tensor</span> = model(tensor.unsqueeze(0))
+      <span style="color: #fcfcfa;">tensor</span> = get_likely_index(tensor)
+      <span style="color: #fcfcfa;">tensor</span> = index_to_label(tensor.squeeze())
+      <span style="color: #ff6188;">return</span> tensor
+
+waveform, sample_rate, utterance, *<span style="color: #fcfcfa;">_</span> = train_set[np.random.randint(<span style="color: #ab9df2;">len</span>(train_set))]
+ipd.Audio(waveform.numpy(), rate=sample_rate)
+
+<span style="color: #ff6188;">print</span>(f<span style="color: #ffd866;">"Expected: {utterance}. Predicted: {predict(waveform)}."</span>)
+</pre>
+</div>
+<p>
+Try playing with the parameters of the model to see if you can improve the accuracy further
+</p>
+</div>
+</div>
+<div id="outline-container-org2bf1ce9" class="outline-3">
+<h3 id="org2bf1ce9">Test your own voice</h3>
+<div class="outline-text-3" id="text-org2bf1ce9">
+<p>
+Google colab enables us to easily try our own audio samples for our trained model. See if you can use the boilerplate code below to test your own voice
+</p>
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #ff6188;">from</span> google.colab <span style="color: #ff6188;">import</span> output <span style="color: #ff6188;">as</span> colab_output
+<span style="color: #ff6188;">from</span> base64 <span style="color: #ff6188;">import</span> b64decode
+<span style="color: #ff6188;">from</span> io <span style="color: #ff6188;">import</span> BytesIO
+<span style="color: #ff6188;">from</span> pydub <span style="color: #ff6188;">import</span> AudioSegment
+
+
+<span style="color: #fcfcfa;">RECORD</span> = <span style="color: #ffd866;">"""</span>
+<span style="color: #ffd866;">const sleep  = time =&gt; new Promise(resolve =&gt; setTimeout(resolve, time))</span>
+<span style="color: #ffd866;">const b2text = blob =&gt; new Promise(resolve =&gt; {</span>
+<span style="color: #ffd866;">  const reader = new FileReader()</span>
+<span style="color: #ffd866;">  reader.onloadend = e =&gt; resolve(e.srcElement.result)</span>
+<span style="color: #ffd866;">  reader.readAsDataURL(blob)</span>
+<span style="color: #ffd866;">})</span>
+<span style="color: #ffd866;">var record = time =&gt; new Promise(async resolve =&gt; {</span>
+<span style="color: #ffd866;">  stream = await navigator.mediaDevices.getUserMedia({ audio: true })</span>
+<span style="color: #ffd866;">  recorder = new MediaRecorder(stream)</span>
+<span style="color: #ffd866;">  chunks = []</span>
+<span style="color: #ffd866;">  recorder.ondataavailable = e =&gt; chunks.push(e.data)</span>
+<span style="color: #ffd866;">  recorder.start()</span>
+<span style="color: #ffd866;">  await sleep(time)</span>
+<span style="color: #ffd866;">  recorder.onstop = async ()=&gt;{</span>
+<span style="color: #ffd866;">    blob = new Blob(chunks)</span>
+<span style="color: #ffd866;">    text = await b2text(blob)</span>
+<span style="color: #ffd866;">    resolve(text)</span>
+<span style="color: #ffd866;">  }</span>
+<span style="color: #ffd866;">  recorder.stop()</span>
+<span style="color: #ffd866;">})</span>
+<span style="color: #ffd866;">"""</span>
+
+
+<span style="color: #ff6188;">def</span> <span style="color: #a9dc76;">record</span>(seconds=1):
+    display(ipd.Javascript(RECORD))
+    <span style="color: #ff6188;">print</span>(f<span style="color: #ffd866;">"Recording started for {seconds} seconds."</span>)
+    <span style="color: #fcfcfa;">s</span> = colab_output.eval_js(<span style="color: #ffd866;">"record(%d)"</span> % (seconds * 1000))
+    <span style="color: #ff6188;">print</span>(<span style="color: #ffd866;">"Recording ended."</span>)
+    <span style="color: #fcfcfa;">b</span> = b64decode(s.split(<span style="color: #ffd866;">","</span>)[1])
+
+    <span style="color: #fcfcfa;">fileformat</span> = <span style="color: #ffd866;">"wav"</span>
+    <span style="color: #fcfcfa;">filename</span> = f<span style="color: #ffd866;">"_audio.{fileformat}"</span>
+    AudioSegment.from_file(BytesIO(b)).export(filename, <span style="color: #ab9df2;">format</span>=fileformat)
+    <span style="color: #ff6188;">return</span> torchaudio.load(filename)
+
+
+<span style="color: #fcfcfa;">waveform</span>, <span style="color: #fcfcfa;">sample_rate</span> = record()
+<span style="color: #ff6188;">print</span>(f<span style="color: #ffd866;">"Predicted: {predict(waveform)}."</span>)
+ipd.Audio(waveform.numpy(), rate=sample_rate)
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-org6b82b7b" class="outline-2">
+<h2 id="org6b82b7b">Task 2-Speech command recognition using RNNs</h2>
+<div class="outline-text-2" id="text-org6b82b7b">
+<p>
+In the first task, we tried to solve the SpeechCommands task using COnvolutional networks. Here, we shall attempt to do so using an RNNs and LSTMs. A good understanding of LSTMs and RNNs in general can be found in <a href="https://colah.github.io/posts/2015-08-Understanding-LSTMs/">Unterstanding LSTMs</a>. A majority of this task has been inspired by a UCA 2019 Deep Learning School lab by Frederic PRECIOSO, Baptiste POUTHIER and Federico UNGOLO.
+It is recommended that a fresh session of Colab is started as the older session might crash due to Disk overflowing issues. Like in the previous task, we start by installing the appropriate libraries
+</p>
+<div class="org-src-container">
+<pre class="src src-python">!pip install torchaudio
+<span style="color: #ff6188;">from</span> IPython.display <span style="color: #ff6188;">import</span> Audio
+
+<span style="color: #727072;">## </span><span style="color: #727072; font-style: italic;">PyTorch things</span>
+<span style="color: #ff6188;">import</span> torch
+<span style="color: #ff6188;">import</span> torchaudio
+<span style="color: #ff6188;">import</span> torch.nn.functional <span style="color: #ff6188;">as</span> F
+
+<span style="color: #727072;">## </span><span style="color: #727072; font-style: italic;">Other libs</span>
+<span style="color: #ff6188;">import</span> matplotlib.pyplot <span style="color: #ff6188;">as</span> plt
+<span style="color: #ff6188;">import</span> glob
+<span style="color: #ff6188;">import</span> os
+<span style="color: #ff6188;">import</span> random
+<span style="color: #ff6188;">from</span> tqdm <span style="color: #ff6188;">import</span> tqdm_notebook
+<span style="color: #ff6188;">import</span> torchsummary
+<span style="color: #ff6188;">import</span> numpy <span style="color: #ff6188;">as</span> np
+<span style="color: #ff6188;">from</span> sklearn.metrics <span style="color: #ff6188;">import</span> confusion_matrix
+<span style="color: #ff6188;">from</span> sklearn.preprocessing <span style="color: #ff6188;">import</span> normalize
+<span style="color: #ff6188;">import</span> pandas <span style="color: #ff6188;">as</span> pd
+<span style="color: #ff6188;">import</span> seaborn <span style="color: #ff6188;">as</span> sn
+</pre>
+</div>
+</div>
+<div id="outline-container-orgb1a8512" class="outline-3">
+<h3 id="orgb1a8512">Dataset</h3>
+<div class="outline-text-3" id="text-orgb1a8512">
+</div>
+<div id="outline-container-org995bc07" class="outline-4">
+<h4 id="org995bc07">Import</h4>
+<div class="outline-text-4" id="text-org995bc07">
+<p>
+In the previous task, we had used the SPEECHCOMMANDS dataset provided by torchaudio itself. However, there will invariably be occasions when we would like to use our own dataset. So, in this task, we will import the same dataset through more conventional means. First, we need to download and extract the dataset from source
+</p>
+<div class="org-src-container">
+<pre class="src src-python">!rm -rf ./*
+!wget -O speech_commands_v0.01.tar.gz http://download.tensorflow.org/data/speech_commands_v0.01.tar.gz
+!tar xzf speech_commands_v0.01.tar.gz 
+!ls
+</pre>
+</div>
+<p>
+To save on space, we will remove some of the non-important files
+</p>
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #fcfcfa;">classes</span> = os.listdir()
+classes.remove(<span style="color: #ffd866;">"LICENSE"</span>)
+classes.remove(<span style="color: #ffd866;">"README.md"</span>)
+classes.remove(<span style="color: #ffd866;">"_background_noise_"</span>)
+classes.remove(<span style="color: #ffd866;">"speech_commands_v0.01.tar.gz"</span>)
+classes.remove(<span style="color: #ffd866;">"testing_list.txt"</span>)
+classes.remove(<span style="color: #ffd866;">"validation_list.txt"</span>)
+classes.remove(<span style="color: #ffd866;">".config"</span>)
+<span style="color: #ff6188;">print</span>(classes)
+<span style="color: #ff6188;">print</span>(<span style="color: #ffd866;">"Number of classes"</span>, <span style="color: #ab9df2;">len</span>(classes))
+</pre>
+</div>
+<p>
+We can listen to as well as plot some random audio sample
+</p>
+<div class="org-src-container">
+<pre class="src src-python">Audio(<span style="color: #ffd866;">"bed/1528225c_nohash_2.wav"</span>)
+<span style="color: #fcfcfa;">waveform</span>, <span style="color: #fcfcfa;">sample_rate</span> = torchaudio.load(<span style="color: #ffd866;">"cat/004ae714_nohash_0.wav"</span>)
+plt.plot(waveform.t())
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org93e6227" class="outline-4">
+<h4 id="org93e6227">Split</h4>
+<div class="outline-text-4" id="text-org93e6227">
+<p>
+As in the previous task, we will be splitting the dataset into train, test and validation
+</p>
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #727072;">## </span><span style="color: #727072; font-style: italic;">Read the test list</span>
+<span style="color: #ff6188;">with</span> <span style="color: #ab9df2;">open</span>(<span style="color: #ffd866;">"testing_list.txt"</span>) <span style="color: #ff6188;">as</span> testing_f:
+  <span style="color: #fcfcfa;">testing_list</span> = [x.strip() <span style="color: #ff6188;">for</span> x <span style="color: #ff6188;">in</span> testing_f.readlines()]
+
+<span style="color: #727072;">## </span><span style="color: #727072; font-style: italic;">Read the val list</span>
+<span style="color: #ff6188;">with</span> <span style="color: #ab9df2;">open</span>(<span style="color: #ffd866;">"validation_list.txt"</span>) <span style="color: #ff6188;">as</span> val_f:
+  <span style="color: #fcfcfa;">validation_list</span> = [x.strip() <span style="color: #ff6188;">for</span> x <span style="color: #ff6188;">in</span> val_f.readlines()]  
+
+<span style="color: #ff6188;">print</span>(<span style="color: #ffd866;">"Number of testing samples"</span>, <span style="color: #ab9df2;">len</span>(testing_list))
+<span style="color: #ff6188;">print</span>(<span style="color: #ffd866;">"Number of validation samples"</span>, <span style="color: #ab9df2;">len</span>(validation_list))
+
+<span style="color: #727072;">## </span><span style="color: #727072; font-style: italic;">Construct a train list</span>
+<span style="color: #fcfcfa;">training_list</span> = []
+<span style="color: #ff6188;">for</span> c <span style="color: #ff6188;">in</span> classes:
+  <span style="color: #fcfcfa;">training_list</span> += glob.glob(c + <span style="color: #ffd866;">"/*"</span>)
+
+<span style="color: #fcfcfa;">training_list</span> = <span style="color: #ab9df2;">list</span>(<span style="color: #ab9df2;">filter</span>(<span style="color: #ff6188;">lambda</span> x : <span style="color: #ff6188;">not</span> x <span style="color: #ff6188;">in</span> testing_list <span style="color: #ff6188;">and</span> <span style="color: #ff6188;">not</span> x <span style="color: #ff6188;">in</span> validation_list, training_list))
+<span style="color: #ff6188;">print</span>(<span style="color: #ffd866;">"Number of training samples"</span>, <span style="color: #ab9df2;">len</span>(training_list))
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-org68cc1cb" class="outline-4">
+<h4 id="org68cc1cb">Transform</h4>
+<div class="outline-text-4" id="text-org68cc1cb">
+<p>
+In this task, instead of downsampling, we will be using the MFCC Transform which is much more common in speech related tasks.
+</p>
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #fcfcfa;">mfcc</span> = torchaudio.transforms.MFCC(n_mfcc=12, log_mels=<span style="color: #ab9df2;">True</span>)(waveform)
+plt.figure()
+plt.imshow(mfcc[0].detach().numpy())
+<span style="color: #ff6188;">print</span>(mfcc.shape)
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orge687a2b" class="outline-4">
+<h4 id="orge687a2b">Dataset class</h4>
+<div class="outline-text-4" id="text-orge687a2b">
+<p>
+Finally, we create our own Dataset class. In this example, we convert from labels to indices within the class itself.
+</p>
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #ff6188;">class</span> <span style="color: #78dce8;">SpeechDataset</span>(torch.utils.data.Dataset):
+
+  <span style="color: #ff6188;">def</span> <span style="color: #a9dc76;">__init__</span>(<span style="color: #ff6188;">self</span>, classes, file_list):
+
+    <span style="color: #ff6188;">self</span>.classes = classes
+
+    <span style="color: #727072;"># </span><span style="color: #727072; font-style: italic;">create a map from class name to integer</span>
+    <span style="color: #ff6188;">self</span>.class_to_int = <span style="color: #ab9df2;">dict</span>(<span style="color: #ab9df2;">zip</span>(classes, <span style="color: #ab9df2;">range</span>(<span style="color: #ab9df2;">len</span>(classes))))
+
+    <span style="color: #727072;"># </span><span style="color: #727072; font-style: italic;">store the file names</span>
+    <span style="color: #ff6188;">self</span>.samples = file_list
+
+    <span style="color: #727072;"># </span><span style="color: #727072; font-style: italic;">store our MFCC transform</span>
+    <span style="color: #ff6188;">self</span>.mfcc_transform = torchaudio.transforms.MFCC(n_mfcc=12, log_mels=<span style="color: #ab9df2;">True</span>)
+
+  <span style="color: #ff6188;">def</span> <span style="color: #a9dc76;">__len__</span>(<span style="color: #ff6188;">self</span>):
+    <span style="color: #ff6188;">return</span> <span style="color: #ab9df2;">len</span>(<span style="color: #ff6188;">self</span>.samples)
+
+  <span style="color: #ff6188;">def</span> <span style="color: #a9dc76;">__getitem__</span>(<span style="color: #ff6188;">self</span>,i):
+    <span style="color: #ff6188;">with</span> torch.no_grad():
+      <span style="color: #727072;"># </span><span style="color: #727072; font-style: italic;">load a normalized waveform</span>
+      <span style="color: #fcfcfa;">waveform</span>,<span style="color: #fcfcfa;">_</span> = torchaudio.load(<span style="color: #ff6188;">self</span>.samples[i])
+
+      <span style="color: #727072;"># </span><span style="color: #727072; font-style: italic;">if the waveform is too short (less than 1 second) we pad it with zeroes</span>
+      <span style="color: #ff6188;">if</span> waveform.shape[1] &lt; 16000:
+        <span style="color: #fcfcfa;">waveform</span> = F.pad(<span style="color: #ab9df2;">input</span>=waveform, pad=(0, 16000 - waveform.shape[1]), mode=<span style="color: #ffd866;">'constant'</span>, value=0)
+
+      <span style="color: #727072;"># </span><span style="color: #727072; font-style: italic;">then, we apply the transform</span>
+      <span style="color: #fcfcfa;">mfcc</span> = <span style="color: #ff6188;">self</span>.mfcc_transform(waveform).squeeze(0).transpose(0,1)
+
+    <span style="color: #727072;"># </span><span style="color: #727072; font-style: italic;">get the label from the file name</span>
+    <span style="color: #fcfcfa;">label</span> = <span style="color: #ff6188;">self</span>.samples[i].split(<span style="color: #ffd866;">"/"</span>)[0]
+
+    <span style="color: #727072;"># </span><span style="color: #727072; font-style: italic;">return the mfcc coefficient with the sample label</span>
+    <span style="color: #ff6188;">return</span> mfcc, <span style="color: #ff6188;">self</span>.class_to_int[label]
+</pre>
+</div>
+<p>
+Finally, using the class definition above, we create out own train and test Dataset
+</p>
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #fcfcfa;">train_set</span> = SpeechDataset(classes, training_list)
+<span style="color: #fcfcfa;">test_set</span> =SpeechDataset(classes, testing_list)
+
+<span style="color: #ff6188;">print</span>(train_set[5][0].shape)
+</pre>
+</div>
+<p>
+We go ahead and create out DataLoaders for train and validation
+</p>
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #fcfcfa;">train_dl</span> = torch.utils.data.DataLoader(train_set, batch_size=16, shuffle=<span style="color: #ab9df2;">True</span>)
+<span style="color: #fcfcfa;">test_dl</span> = torch.utils.data.DataLoader(test_set, batch_size=16)
+<span style="color: #ff6188;">print</span>(<span style="color: #ab9df2;">next</span>(<span style="color: #ab9df2;">iter</span>(train_dl)))
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgecf5d11" class="outline-3">
+<h3 id="orgecf5d11">Network</h3>
+<div class="outline-text-3" id="text-orgecf5d11">
+</div>
+<div id="outline-container-org6326611" class="outline-4">
+<h4 id="org6326611">Architecture</h4>
+<div class="outline-text-4" id="text-org6326611">
+<p>
+Here, we create an LSTM network. The input size for the same is 12 (Dictated by our MFCC transform). Then we have 2 hidden layers of dimension 256. Then we finally have an output layer of size 30(number of output labels)
+</p>
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #ff6188;">class</span> <span style="color: #78dce8;">SpeechRNN</span>(torch.nn.Module):
+
+  <span style="color: #ff6188;">def</span> <span style="color: #a9dc76;">__init__</span>(<span style="color: #ff6188;">self</span>):
+    <span style="color: #ab9df2;">super</span>(SpeechRNN, <span style="color: #ff6188;">self</span>).__init__()
+
+    <span style="color: #ff6188;">self</span>.rnn = torch.nn.LSTM(input_size = 12, 
+                              hidden_size= 256, 
+                              num_layers = 2, 
+                              batch_first=<span style="color: #ab9df2;">True</span>)
+
+    <span style="color: #ff6188;">self</span>.out_layer = torch.nn.Linear(256, 30)
+
+    <span style="color: #ff6188;">self</span>.softmax = torch.nn.LogSoftmax(dim=1)
+
+  <span style="color: #ff6188;">def</span> <span style="color: #a9dc76;">forward</span>(<span style="color: #ff6188;">self</span>, x):
+
+    <span style="color: #fcfcfa;">out</span>, <span style="color: #fcfcfa;">_</span> = <span style="color: #ff6188;">self</span>.rnn(x)
+
+    <span style="color: #fcfcfa;">x</span> = <span style="color: #ff6188;">self</span>.out_layer(out[:,-1,:])
+
+    <span style="color: #ff6188;">return</span> <span style="color: #ff6188;">self</span>.softmax(x)
+</pre>
+</div>
+<p>
+Like in the previous task, we also need to define the optimiser and related parameters
+</p>
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #727072;">##</span><span style="color: #727072; font-style: italic;">RE-RUN THIS CODE TO GET A "NEW" NETWORK</span>
+
+<span style="color: #fcfcfa;">LEARNING_RATE</span> = 0.001
+
+<span style="color: #727072;">## </span><span style="color: #727072; font-style: italic;">Create an instance of our network</span>
+<span style="color: #fcfcfa;">net</span> = SpeechRNN()
+
+<span style="color: #727072;">## </span><span style="color: #727072; font-style: italic;">Move it to the GPU</span>
+<span style="color: #fcfcfa;">net</span> = net.cuda()
+
+<span style="color: #727072;"># </span><span style="color: #727072; font-style: italic;">Negative log likelihood loss</span>
+<span style="color: #fcfcfa;">criterion</span> = torch.nn.NLLLoss()
+
+<span style="color: #727072;"># </span><span style="color: #727072; font-style: italic;">Adam optimizer</span>
+<span style="color: #fcfcfa;">optimizer</span> = torch.optim.Adam(net.parameters(), lr=LEARNING_RATE)
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org7e98982" class="outline-4">
+<h4 id="org7e98982">Train/Test</h4>
+<div class="outline-text-4" id="text-org7e98982">
+<p>
+Like in the previous task, we finally need to train.test the network. However, unlike the previous example, we have not written the explicit train and test functions. We define the train and test loop in our main loop itself.
+</p>
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #727072;">## </span><span style="color: #727072; font-style: italic;">NUMBER OF EPOCHS TO TRAIN</span>
+<span style="color: #fcfcfa;">N_EPOCHS</span> = 5
+
+<span style="color: #fcfcfa;">epoch_loss</span>, <span style="color: #fcfcfa;">epoch_acc</span>, <span style="color: #fcfcfa;">epoch_test_loss</span>, <span style="color: #fcfcfa;">epoch_test_acc</span> = [], [], [], []
+
+<span style="color: #ff6188;">for</span> e <span style="color: #ff6188;">in</span> <span style="color: #ab9df2;">range</span>(N_EPOCHS):
+
+  <span style="color: #ff6188;">print</span>(<span style="color: #ffd866;">"EPOCH:"</span>,e)
+
+  <span style="color: #727072;">### </span><span style="color: #727072; font-style: italic;">TRAINING LOOP</span>
+  <span style="color: #fcfcfa;">running_loss</span> = 0
+  <span style="color: #fcfcfa;">running_accuracy</span> = 0
+
+  <span style="color: #727072;">## </span><span style="color: #727072; font-style: italic;">Put the network in training mode</span>
+  net.train()
+
+  <span style="color: #ff6188;">for</span> i, batch <span style="color: #ff6188;">in</span> <span style="color: #ab9df2;">enumerate</span>(tqdm_notebook(train_dl)):
+
+    <span style="color: #727072;"># </span><span style="color: #727072; font-style: italic;">Get a batch from the dataloader</span>
+    <span style="color: #fcfcfa;">x</span> = batch[0]
+    <span style="color: #fcfcfa;">labels</span> = batch[1]
+
+    <span style="color: #727072;"># </span><span style="color: #727072; font-style: italic;">move the batch to GPU</span>
+    <span style="color: #fcfcfa;">x</span> = x.cuda()
+    <span style="color: #fcfcfa;">labels</span> = labels.cuda()
+
+    <span style="color: #727072;"># </span><span style="color: #727072; font-style: italic;">Compute the network output</span>
+    <span style="color: #fcfcfa;">y</span> = net(x)
+
+    <span style="color: #727072;"># </span><span style="color: #727072; font-style: italic;">Compute the loss</span>
+    <span style="color: #fcfcfa;">loss</span> = criterion(y, labels)
+
+    <span style="color: #727072;"># </span><span style="color: #727072; font-style: italic;">Reset the gradients</span>
+    optimizer.zero_grad()
+
+    <span style="color: #727072;"># </span><span style="color: #727072; font-style: italic;">Compute the gradients</span>
+    loss.backward()
+
+    <span style="color: #727072;"># </span><span style="color: #727072; font-style: italic;">Apply one step of the descent algorithm to update the weights</span>
+    optimizer.step()
+
+    <span style="color: #727072;">## </span><span style="color: #727072; font-style: italic;">Compute some statistics</span>
+    <span style="color: #ff6188;">with</span> torch.no_grad():
+      <span style="color: #fcfcfa;">running_loss</span> += loss.item()
+      <span style="color: #fcfcfa;">running_accuracy</span> += (y.<span style="color: #ab9df2;">max</span>(1)[1] == labels).<span style="color: #ab9df2;">sum</span>().item()
+
+  <span style="color: #ff6188;">print</span>(<span style="color: #ffd866;">"Training accuracy:"</span>, running_accuracy/<span style="color: #ab9df2;">float</span>(<span style="color: #ab9df2;">len</span>(train_set)),
+        <span style="color: #ffd866;">"Training loss:"</span>, running_loss/<span style="color: #ab9df2;">float</span>(<span style="color: #ab9df2;">len</span>(train_set)))
+
+  epoch_loss.append(running_loss/<span style="color: #ab9df2;">len</span>(train_set))
+  epoch_acc.append(running_accuracy/<span style="color: #ab9df2;">len</span>(train_set))
+
+  <span style="color: #727072;">### </span><span style="color: #727072; font-style: italic;">VALIDATION LOOP</span>
+  <span style="color: #727072;">## </span><span style="color: #727072; font-style: italic;">Put the network in validation mode</span>
+  net.<span style="color: #ab9df2;">eval</span>()
+
+  <span style="color: #fcfcfa;">running_test_loss</span> = 0
+  <span style="color: #fcfcfa;">running_test_accuracy</span> = 0
+
+  <span style="color: #ff6188;">for</span> i, batch <span style="color: #ff6188;">in</span> <span style="color: #ab9df2;">enumerate</span>(test_dl):
+
+    <span style="color: #ff6188;">with</span> torch.no_grad():
+      <span style="color: #727072;"># </span><span style="color: #727072; font-style: italic;">Get a batch from the dataloader</span>
+      <span style="color: #fcfcfa;">x</span> = batch[0]
+      <span style="color: #fcfcfa;">labels</span> = batch[1]
+
+      <span style="color: #727072;"># </span><span style="color: #727072; font-style: italic;">move the batch to GPU</span>
+      <span style="color: #fcfcfa;">x</span> = x.cuda()
+      <span style="color: #fcfcfa;">labels</span> = labels.cuda()
+
+      <span style="color: #727072;"># </span><span style="color: #727072; font-style: italic;">Compute the network output</span>
+      <span style="color: #fcfcfa;">y</span>= net(x)
+
+      <span style="color: #727072;"># </span><span style="color: #727072; font-style: italic;">Compute the loss</span>
+      <span style="color: #fcfcfa;">loss</span> = criterion(y, labels)
+
+      <span style="color: #fcfcfa;">running_test_loss</span> += loss.item()
+      <span style="color: #fcfcfa;">running_test_accuracy</span> += (y.<span style="color: #ab9df2;">max</span>(1)[1] == labels).<span style="color: #ab9df2;">sum</span>().item()
+
+  <span style="color: #ff6188;">print</span>(<span style="color: #ffd866;">"Validation accuracy:"</span>, running_test_accuracy/<span style="color: #ab9df2;">float</span>(<span style="color: #ab9df2;">len</span>(test_set)),
+        <span style="color: #ffd866;">"Validation loss:"</span>, running_test_loss/<span style="color: #ab9df2;">float</span>(<span style="color: #ab9df2;">len</span>(test_set)))
+
+  epoch_test_loss.append(running_test_loss/<span style="color: #ab9df2;">len</span>(test_set))
+  epoch_test_acc.append(running_test_accuracy/<span style="color: #ab9df2;">len</span>(test_set))
+
+</pre>
+</div>
+<p>
+Please try to improve the accuracy above by fiddling with the network. Try using different RNN variants (example GRU) to see if you can improve the results.
+</p>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org063f974" class="outline-2">
+<h2 id="org063f974">Task3- How to use a pre-trained model?</h2>
+<div class="outline-text-2" id="text-org063f974">
+<p>
+Finally we look at how to use pretrained models. For the purpose of this tutorial, we will be using the <a href="https://ai.facebook.com/blog/wav2vec-state-of-the-art-speech-recognition-through-self-supervision/">Wav2Vec</a> model developed by Facebook trained on 960 hrs of LibriSpeech. Like the previous tasks, we will be using Google colab in interactive mode to record our voice and infer the output. Majority of this tutorial has been taken from <a href="https://github.com/niksarrow/asr">a Speech to Speech NASSCOM workshop</a>.
+</p>
+</div>
+
+<div id="outline-container-orgd490e96" class="outline-3">
+<h3 id="orgd490e96">Download the model</h3>
+<div class="outline-text-3" id="text-orgd490e96">
+<p>
+Please start a fresh colab session. We use the <a href="https://pypi.org/project/transformers/">Transformers</a> module which gives access to many pre-trained modules.
+</p>
+<div class="org-src-container">
+<pre class="src src-python">!pip install transformers==4.4.0 
+!pip install torchaudio
+!pip install ffmpeg-python
+</pre>
+</div>
+<p>
+Then we load the input processor and model from transformers.
+</p>
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #ff6188;">import</span> scipy
+<span style="color: #ff6188;">import</span> torchaudio
+<span style="color: #ff6188;">import</span> torch
+<span style="color: #ff6188;">from</span> transformers <span style="color: #ff6188;">import</span> Wav2Vec2Processor
+<span style="color: #ff6188;">from</span> transformers <span style="color: #ff6188;">import</span> Wav2Vec2ForCTC
+<span style="color: #fcfcfa;">processor</span> = Wav2Vec2Processor.from_pretrained(<span style="color: #ffd866;">"facebook/wav2vec2-base-960h"</span>)
+<span style="color: #fcfcfa;">model</span> = Wav2Vec2ForCTC.from_pretrained(<span style="color: #ffd866;">"facebook/wav2vec2-base-960h"</span>)
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org93ee7d7" class="outline-3">
+<h3 id="org93ee7d7">Record voice</h3>
+<div class="outline-text-3" id="text-org93ee7d7">
+<p>
+Below is the boilerplate to enable google colab to record voice from your mic. You will have to give access to microphone if prompted
+</p>
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #ff6188;">from</span> IPython.display <span style="color: #ff6188;">import</span> HTML, Audio
+<span style="color: #ff6188;">from</span> google.colab.output <span style="color: #ff6188;">import</span> eval_js
+<span style="color: #ff6188;">from</span> base64 <span style="color: #ff6188;">import</span> b64decode
+<span style="color: #ff6188;">import</span> numpy <span style="color: #ff6188;">as</span> np
+<span style="color: #ff6188;">from</span> scipy.io.wavfile <span style="color: #ff6188;">import</span> read <span style="color: #ff6188;">as</span> wav_read
+<span style="color: #ff6188;">import</span> io
+<span style="color: #ff6188;">import</span> ffmpeg
+
+<span style="color: #fcfcfa;">AUDIO_HTML</span> = <span style="color: #ffd866;">"""</span>
+<span style="color: #ffd866;">&lt;script&gt;</span>
+<span style="color: #ffd866;">var my_div = document.createElement("DIV");</span>
+<span style="color: #ffd866;">var my_p = document.createElement("P");</span>
+<span style="color: #ffd866;">var my_btn = document.createElement("BUTTON");</span>
+<span style="color: #ffd866;">var t = document.createTextNode("Press to start recording");</span>
+
+<span style="color: #ffd866;">my_btn.appendChild(t);</span>
+<span style="color: #ffd866;">//my_p.appendChild(my_btn);</span>
+<span style="color: #ffd866;">my_div.appendChild(my_btn);</span>
+<span style="color: #ffd866;">document.body.appendChild(my_div);</span>
+
+<span style="color: #ffd866;">var base64data = 0;</span>
+<span style="color: #ffd866;">var reader;</span>
+<span style="color: #ffd866;">var recorder, gumStream;</span>
+<span style="color: #ffd866;">var recordButton = my_btn;</span>
+
+<span style="color: #ffd866;">var handleSuccess = function(stream) {</span>
+<span style="color: #ffd866;">  gumStream = stream;</span>
+<span style="color: #ffd866;">  var options = {</span>
+<span style="color: #ffd866;">    //bitsPerSecond: 8000, //chrome seems to ignore, always 48k</span>
+<span style="color: #ffd866;">    mimeType : 'audio/webm;codecs=opus'</span>
+<span style="color: #ffd866;">    //mimeType : 'audio/webm;codecs=pcm'</span>
+<span style="color: #ffd866;">  };            </span>
+<span style="color: #ffd866;">  //recorder = new MediaRecorder(stream, options);</span>
+<span style="color: #ffd866;">  recorder = new MediaRecorder(stream);</span>
+<span style="color: #ffd866;">  recorder.ondataavailable = function(e) {            </span>
+<span style="color: #ffd866;">    var url = URL.createObjectURL(e.data);</span>
+<span style="color: #ffd866;">    var preview = document.createElement('audio');</span>
+<span style="color: #ffd866;">    preview.controls = true;</span>
+<span style="color: #ffd866;">    preview.src = url;</span>
+<span style="color: #ffd866;">    document.body.appendChild(preview);</span>
+
+<span style="color: #ffd866;">    reader = new FileReader();</span>
+<span style="color: #ffd866;">    reader.readAsDataURL(e.data); </span>
+<span style="color: #ffd866;">    reader.onloadend = function() {</span>
+<span style="color: #ffd866;">      base64data = reader.result;</span>
+<span style="color: #ffd866;">      //console.log("Inside FileReader:" + base64data);</span>
+<span style="color: #ffd866;">    }</span>
+<span style="color: #ffd866;">  };</span>
+<span style="color: #ffd866;">  recorder.start();</span>
+<span style="color: #ffd866;">  };</span>
+
+<span style="color: #ffd866;">recordButton.innerText = "Recording... press to stop";</span>
+
+<span style="color: #ffd866;">navigator.mediaDevices.getUserMedia({audio: true}).then(handleSuccess);</span>
+
+
+<span style="color: #ffd866;">function toggleRecording() {</span>
+<span style="color: #ffd866;">  if (recorder &amp;&amp; recorder.state == "recording") {</span>
+<span style="color: #ffd866;">      recorder.stop();</span>
+<span style="color: #ffd866;">      gumStream.getAudioTracks()[0].stop();</span>
+<span style="color: #ffd866;">      recordButton.innerText = "Saving the recording... pls wait!"</span>
+<span style="color: #ffd866;">  }</span>
+<span style="color: #ffd866;">}</span>
+
+<span style="color: #ffd866;">// https://stackoverflow.com/a/951057</span>
+<span style="color: #ffd866;">function sleep(ms) {</span>
+<span style="color: #ffd866;">  return new Promise(resolve =&gt; setTimeout(resolve, ms));</span>
+<span style="color: #ffd866;">}</span>
+
+<span style="color: #ffd866;">var data = new Promise(resolve=&gt;{</span>
+<span style="color: #ffd866;">//recordButton.addEventListener("click", toggleRecording);</span>
+<span style="color: #ffd866;">recordButton.onclick = ()=&gt;{</span>
+<span style="color: #ffd866;">toggleRecording()</span>
+
+<span style="color: #ffd866;">sleep(2000).then(() =&gt; {</span>
+<span style="color: #ffd866;">  // wait 2000ms for the data to be available...</span>
+<span style="color: #ffd866;">  // ideally this should use something like await...</span>
+<span style="color: #ffd866;">  //console.log("Inside data:" + base64data)</span>
+<span style="color: #ffd866;">  resolve(base64data.toString())</span>
+
+<span style="color: #ffd866;">});</span>
+
+<span style="color: #ffd866;">}</span>
+<span style="color: #ffd866;">});</span>
+
+<span style="color: #ffd866;">&lt;/script&gt;</span>
+<span style="color: #ffd866;">"""</span>
+
+<span style="color: #ff6188;">def</span> <span style="color: #a9dc76;">get_audio</span>():
+  display(HTML(AUDIO_HTML))
+  <span style="color: #fcfcfa;">data</span> = eval_js(<span style="color: #ffd866;">"data"</span>)
+  <span style="color: #fcfcfa;">binary</span> = b64decode(data.split(<span style="color: #ffd866;">','</span>)[1])
+
+  <span style="color: #fcfcfa;">process</span> = (ffmpeg
+    .<span style="color: #ab9df2;">input</span>(<span style="color: #ffd866;">'pipe:0'</span>)
+    .output(<span style="color: #ffd866;">'pipe:1'</span>, <span style="color: #ab9df2;">format</span>=<span style="color: #ffd866;">'wav'</span>)
+    .run_async(pipe_stdin=<span style="color: #ab9df2;">True</span>, pipe_stdout=<span style="color: #ab9df2;">True</span>, pipe_stderr=<span style="color: #ab9df2;">True</span>, quiet=<span style="color: #ab9df2;">True</span>, overwrite_output=<span style="color: #ab9df2;">True</span>)
+  )
+  <span style="color: #fcfcfa;">output</span>, <span style="color: #fcfcfa;">err</span> = process.communicate(<span style="color: #ab9df2;">input</span>=binary)
+
+  <span style="color: #fcfcfa;">riff_chunk_size</span> = <span style="color: #ab9df2;">len</span>(output) - 8
+  <span style="color: #727072;"># </span><span style="color: #727072; font-style: italic;">Break up the chunk size into four bytes, held in b.</span>
+  <span style="color: #fcfcfa;">q</span> = riff_chunk_size
+  <span style="color: #fcfcfa;">b</span> = []
+  <span style="color: #ff6188;">for</span> i <span style="color: #ff6188;">in</span> <span style="color: #ab9df2;">range</span>(4):
+      <span style="color: #fcfcfa;">q</span>, <span style="color: #fcfcfa;">r</span> = <span style="color: #ab9df2;">divmod</span>(q, 256)
+      b.append(r)
+
+  <span style="color: #727072;"># </span><span style="color: #727072; font-style: italic;">Replace bytes 4:8 in proc.stdout with the actual size of the RIFF chunk.</span>
+  <span style="color: #fcfcfa;">riff</span> = output[:4] + <span style="color: #ab9df2;">bytes</span>(b) + output[8:]
+
+  <span style="color: #fcfcfa;">sr</span>, <span style="color: #fcfcfa;">audio</span> = wav_read(io.BytesIO(riff))
+
+  <span style="color: #ff6188;">return</span> audio, sr
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgf460810" class="outline-3">
+<h3 id="orgf460810">Record and Infer</h3>
+<div class="outline-text-3" id="text-orgf460810">
+<p>
+The snippet below uses the function defined above and records your voic
+</p>
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #fcfcfa;">audio</span>, <span style="color: #fcfcfa;">sr</span> = get_audio()
+scipy.io.wavfile.write(<span style="color: #ffd866;">'./recording.wav'</span>, sr, audio)
+</pre>
+</div>
+<p>
+We loaf the waveform which we recorded and resample it at 16K Hz (as the dataset on which Word2Vec was trained is sampled at 16K Hz)
+</p>
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #fcfcfa;">waveform</span>, <span style="color: #fcfcfa;">sample_rate</span> = torchaudio.load(<span style="color: #ffd866;">"./recording.wav"</span>)
+<span style="color: #fcfcfa;">Resample</span> = torchaudio.transforms.Resample(orig_freq = 48000, new_freq = 16000, resampling_method = <span style="color: #ffd866;">'sinc_interpolation'</span>)
+<span style="color: #fcfcfa;">waveform</span>, <span style="color: #fcfcfa;">sample_rate</span> = Resample.forward(waveform), 16000
+</pre>
+</div>
+<p>
+You can change the path of 'recording.wav' to use any other recording or audio snippet you are interested in. Finally, we predict/infer what is in the recording using the pretrained model.
+</p>
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #ff6188;">def</span> <span style="color: #a9dc76;">interactive</span>():
+  model.to(<span style="color: #ffd866;">"cuda"</span>)
+  <span style="color: #fcfcfa;">input_values</span> = processor(
+      waveform[0].tolist(), 
+      sampling_rate=sample_rate, 
+      return_tensors=<span style="color: #ffd866;">"pt"</span>
+  ).input_values.to(<span style="color: #ffd866;">"cuda"</span>)
+
+  <span style="color: #ff6188;">with</span> torch.no_grad():
+    <span style="color: #fcfcfa;">logits</span> = model(input_values).logits
+
+  <span style="color: #fcfcfa;">pred_ids</span> = torch.argmax(logits, dim=-1)
+  <span style="color: #727072;"># </span><span style="color: #727072; font-style: italic;">batch["pred_str"] = processor.batch_decode(pred_ids)[0]</span>
+  <span style="color: #fcfcfa;">pred_str</span> = processor.batch_decode(pred_ids)[0]
+  <span style="color: #ff6188;">return</span> pred_str.lower()
+
+interactive()
+</pre>
+</div>
+<p>
+How good/bad are the inferences? Are you able to improve/deteriorate the accuracy by modulating your voice or speech patterns? These will help you understand the limitations of current SOTA systems.
+</p>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="author">Author: Vinit Unni</p>
+<p class="date">Created: 2021-05-24 Mon 15:50</p>
+<p class="validation"><a href="https://validator.w3.org/check?uri=referer">Validate</a></p>
+</div>
+</body>
+</html>
