@@ -1,4 +1,4 @@
-# C-MInDS-IITBCourse
+# ML/DL - IIT Bombay Course
 Code repository for IIT Bombay ML/DL course (2021).
 
 Contents of the code repository:
