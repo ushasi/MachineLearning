@@ -3,6 +3,8 @@ Code repository for IIT Bombay ML/DL course (2021).
 
 Contents of the code repository:
 
+Machine Learning part:
+
 1. Linear Regression -  Includes SkLearn-based implementation and code from scratch.
 2. Logistic Regression - Includes SkLearn-based implementation and code from scratch.
 3. K Nearest Neighbors classifier 
@@ -18,3 +20,8 @@ Deep Learning part:
 2.  Convolutional neural networks - For both image and NLP.
 3.  Recurrent neural network - For NLP.
 4.  VGG Net - Using pretrained network and finetuning and its implementation from scratch.
+5.  Speech and NLP tasks
+6.  Image captioning
+7.  Image to image translation
+8.  Machine translation of language.
+9.  Multitask learning.
