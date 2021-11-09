@@ -1,4 +1,7 @@
 # ML/DL - IIT Bombay Course
+
+[TensorFlow](https://www.tensorflow.org/) | [Keras](https://keras.io/) | [PyTorch](https://pytorch.org/) 
+
 Code repository for IIT Bombay ML/DL course (2021).
 
 Contents of the code repository:
