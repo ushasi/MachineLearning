@@ -31,3 +31,4 @@ Deep Learning part:
 10. Autoencoder for image denoising.
 11. VAE for mnist.
 12. U Net for image segmentation.
+13. RCNN for airplane detection.
