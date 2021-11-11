@@ -28,3 +28,6 @@ Deep Learning part:
 7.  Image to image translation
 8.  Machine translation of language.
 9.  Multitask learning.
+10. Autoencoder for image denoising.
+11. VAE for mnist.
+12. U Net for image segmentation.
